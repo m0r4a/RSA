@@ -24,7 +24,7 @@ def compile_c_library():
     if not lib_file.exists() or lib_file.stat().st_mtime < c_file.stat().st_mtime:
         try:
             subprocess.run(
-                [gcc_path, "-shared", "-o",
+                [gcc_path, "-O2", "-shared", "-o",
                     str(lib_file), "-fPIC", str(c_file)],
                 check=True
             )
@@ -46,9 +46,6 @@ num_lib.power_mod.restype = ctypes.c_uint64
 num_lib.is_prime.argtypes = [ctypes.c_uint64]
 num_lib.is_prime.restype = ctypes.c_int
 
-num_lib.get_prime.argtypes = [ctypes.c_int]
-num_lib.get_prime.restype = ctypes.c_uint64
-
 
 def power_mod(base: int, exponent: int, modulus: int) -> int:
     """
@@ -68,10 +65,8 @@ def is_prime(n: int) -> bool:
     return bool(num_lib.is_prime(n))
 
 
-def generate_prime(bits: int) -> int:
-    """
-    Generate a prime number
-    """
-    if bits <= 0:
-        raise ValueError("Bits must be positive")
-    return num_lib.get_prime(bits)
+# Quicky tests
+if __name__ == "__main__":
+    print(f"2^10 mod 1000 = {power_mod(2, 10, 1000)}")  # presuntamente 24
+    # Test primality
+    print(f"Is 17 prime? {is_prime(17)}")  # True

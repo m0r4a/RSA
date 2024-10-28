@@ -55,20 +55,12 @@ int miller_rabin(uint64_t n, int k) {
     return 1;
 }
 
-// Generate prime nums
-uint64_t generate_prime(int bits) {
-    uint64_t n;
-    do {
-        n = 0;
-        for (int i = 0; i < bits; i++) {
-            n = (n << 1) | (rand() & 1);
-        }
 
-        n |= (1ULL << (bits - 1)) | 1;
-    } while (!miller_rabin(n, 5));
-
-    return n;
+// Generate random num
+uint64_t random_uint64() {
+    return ((uint64_t)rand() << 32) | rand();
 }
+
 
 // Export the functions
 __attribute__((visibility("default")))
@@ -78,10 +70,5 @@ uint64_t power_mod(uint64_t base, uint64_t exponent, uint64_t modulus) {
 
 __attribute__((visibility("default")))
 int is_prime(uint64_t n) {
-    return miller_rabin(n, 5);
-}
-
-__attribute__((visibility("default")))
-uint64_t get_prime(int bits) {
-    return generate_prime(bits);
+    return miller_rabin(n, 3);
 }

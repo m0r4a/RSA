@@ -1,4 +1,5 @@
-from c_utils.c_utils import power_mod, is_prime, generate_prime
+# TODO: Recreate the power_mod, is prime and generate_prime nums
+from c_utils.c_utils import power_mod, is_prime
 
 
 def modular_inverse(a: int, m: int):
@@ -13,8 +14,8 @@ def modular_inverse(a: int, m: int):
     Returns:
         The modular multiplicative inverse if it exists
     """
+
     def extended_gcd(a: int, b: int):
-        """Helper function to compute extended GCD and Bézout's coefficients"""
         if a == 0:
             return b, 0, 1
         gcd, x1, y1 = extended_gcd(b % a, a)
