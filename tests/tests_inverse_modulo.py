@@ -1,11 +1,11 @@
 #!/bin/python3
 
-# This file contains tests for my utils
+# This file contains tests for the modular inverse function
 
+from utils import modular_inverse
+import pytest
 import sys
 import os
-import pytest
-from utils import modular_inverse
 
 sys.path.append(
     os.path.abspath(

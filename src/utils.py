@@ -1,3 +1,6 @@
+from c_utils.c_utils import power_mod, is_prime, generate_prime
+
+
 def modular_inverse(a: int, m: int):
     """
     Calculate the modular multiplicative inverse of a modulo m using
@@ -32,9 +35,3 @@ def modular_inverse(a: int, m: int):
         raise ValueError(f"{a} has no multiplicative inverse modulo {m}")
 
     return (x % m + m) % m
-
-
-# Test cases
-print("Test cases:")
-print(f"Inverse of 3 mod 11 = {modular_inverse(3, 11)}")  # Should be 4
-print(f"Inverse of 17 mod 23 = {modular_inverse(17, 23)}")  # Should be 19
