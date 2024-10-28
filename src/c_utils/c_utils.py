@@ -7,18 +7,19 @@ from pathlib import Path
 # Compile the C library if needed
 def compile_c_library():
     src_dir = Path(__file__).parent
-    c_file = src_dir / "c_utils.c"
+    C_FILE = src_dir / "c_utils.c"
 
     if system() == "Linux":
-        lib_file = src_dir / "libcutils.so"
+        LIB_FILE = src_dir / "libcutils.so"
     else:
         # This might be an error lol
         # Why would you not use Linux?
-        lib_file = src_dir / "libcutils.dll"
+        LIB_FILE = src_dir / "libcutils.dll"
 
-    if not lib_file.exists() or lib_file.stat().st_mtime < c_file.stat().st_mtime:
-        os.system(f"gcc -shared -o {lib_file} -fPIC {c_file}")
-    return lib_file
+    if not LIB_FILE.exists() or LIB_FILE.stat().st_mtime < C_FILE.stat().st_mtime:
+        os.system(f"gcc -shared -o {LIB_FILE} -fPIC {C_FILE}")
+
+    return LIB_FILE
 
 
 # Loading the library
