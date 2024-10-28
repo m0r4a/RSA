@@ -2,4 +2,4 @@
 
 from utils import generate_prime_pair
 
-print(generate_prime_pair(2048))
+print(generate_prime_pair(512))

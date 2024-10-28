@@ -79,10 +79,8 @@ def _check_low_prime(n: int, low_primes: List[int]) -> bool:
     Returns:
         bool: True if `n` is not divisible by any of the low primes, False otherwise.
     """
-    for prime in low_primes:
-        if n % prime == 0 and prime ** 2 <= n:
-            return False
-    return True
+
+    return all(n % prime != 0 or prime ** 2 > n for prime in low_primes)
 
 
 def _generate_random_prime(bits: int, low_primes: List[int]) -> int:
