@@ -1,25 +1,30 @@
 import ctypes
-import os
 from platform import system
 from pathlib import Path
+import subprocess
 
 
 # Compile the C library if needed
 def compile_c_library():
     src_dir = Path(__file__).parent
-    C_FILE = src_dir / "c_utils.c"
+    c_file = src_dir / "c_utils.c"
 
     if system() == "Linux":
-        LIB_FILE = src_dir / "libcutils.so"
+        lib_file = src_dir / "libcutils.so"
     else:
-        # This might be an error lol
-        # Why would you not use Linux?
-        LIB_FILE = src_dir / "libcutils.dll"
+        lib_file = src_dir / "libcutils.dll"
 
-    if not LIB_FILE.exists() or LIB_FILE.stat().st_mtime < C_FILE.stat().st_mtime:
-        os.system(f"gcc -shared -o {LIB_FILE} -fPIC {C_FILE}")
-
-    return LIB_FILE
+    # Check if recompilation is needed
+    if not lib_file.exists() or lib_file.stat().st_mtime < c_file.stat().st_mtime:
+        try:
+            subprocess.run(
+                ["gcc", "-shared", "-o", str(lib_file), "-fPIC", str(c_file)],
+                check=True
+            )
+            print(f"Library compiled: {lib_file}")
+        except subprocess.CalledProcessError as e:
+            print(f"Compilation failed with error: {e}")
+    return lib_file
 
 
 # Loading the library
