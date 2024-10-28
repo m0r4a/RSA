@@ -1,5 +1,6 @@
 import ctypes
 import os
+from platform import system
 from pathlib import Path
 
 
@@ -7,8 +8,13 @@ from pathlib import Path
 def compile_c_library():
     src_dir = Path(__file__).parent
     c_file = src_dir / "c_utils.c"
-    lib_file = src_dir / "libcutils.so"  # If Linux
-    # lib_file = src_dir / "libnumtheory.dll"  # If you don't know about good OS
+
+    if system() == "Linux":
+        lib_file = src_dir / "libcutils.so"
+    else:
+        # This might be an error lol
+        # Why would you not use Linux?
+        lib_file = src_dir / "libnumtheory.dll"
 
     if not lib_file.exists() or lib_file.stat().st_mtime < c_file.stat().st_mtime:
         os.system(f"gcc -shared -o {lib_file} -fPIC {c_file}")
