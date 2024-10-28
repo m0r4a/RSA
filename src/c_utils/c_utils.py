@@ -2,6 +2,7 @@ import ctypes
 from platform import system
 from pathlib import Path
 import subprocess
+import shutil
 
 
 # Compile the C library if needed
@@ -14,16 +15,22 @@ def compile_c_library():
     else:
         lib_file = src_dir / "libcutils.dll"
 
-    # Check if recompilation is needed
+    # Find gcc path
+    gcc_path = shutil.which("gcc")
+    if not gcc_path:
+        raise FileNotFoundError("GCC compiler not found.")
+
+    # Checking part
     if not lib_file.exists() or lib_file.stat().st_mtime < c_file.stat().st_mtime:
         try:
             subprocess.run(
-                ["gcc", "-shared", "-o", str(lib_file), "-fPIC", str(c_file)],
+                [gcc_path, "-shared", "-o",
+                    str(lib_file), "-fPIC", str(c_file)],
                 check=True
             )
-            print(f"Library compiled: {lib_file}")
         except subprocess.CalledProcessError as e:
             print(f"Compilation failed with error: {e}")
+
     return lib_file
 
 
