@@ -56,16 +56,3 @@ def generate_prime(bits: int) -> int:
     if bits <= 0:
         raise ValueError("Bits must be positive")
     return num_lib.get_prime(bits)
-
-
-# Quicky tests
-if __name__ == "__main__":
-    print(f"2^10 mod 1000 = {power_mod(2, 10, 1000)}")  # presuntamente 24
-
-    # Test primality
-    print(f"Is 17 prime? {is_prime(17)}")  # True
-
-    # Test prime generation
-    prime = generate_prime(16)
-    print(f"Generated 16-bit prime: {prime}")
-    print(f"Verification - is it prime? {is_prime(prime)}")
