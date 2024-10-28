@@ -1,22 +1,34 @@
 import ctypes
-from platform import system
 from pathlib import Path
-import subprocess
+from platform import system
 import shutil
+import subprocess
 
 
-# Compile the C library if needed
-def compile_c_library():
-    src_dir = Path(__file__).parent
-    c_file = src_dir / "c_utils.c"
+def compile_c_library() -> Path:
+    """
+    Compiles a C library from a source file.
+
+    This function determines the appropriate library file extension based on the operating system,
+    locates the GCC compiler, and compiles the C source file into a shared library if the library
+    file does not exist or is outdated.
+
+    Returns:
+        Path: The path to the compiled library file.
+
+    Raises:
+        FileNotFoundError: If the GCC compiler is not found.
+    """
+    src_dir: Path = Path(__file__).parent
+    c_file: Path = src_dir / "c_utils.c"
 
     if system() == "Linux":
-        lib_file = src_dir / "libcutils.so"
+        lib_file: Path = src_dir / "libcutils.so"
     else:
-        lib_file = src_dir / "libcutils.dll"
+        lib_file: Path = src_dir / "libcutils.dll"
 
     # Find gcc path
-    gcc_path = shutil.which("gcc")
+    gcc_path: str = shutil.which("gcc")
     if not gcc_path:
         raise FileNotFoundError("GCC compiler not found.")
 
@@ -49,7 +61,21 @@ num_lib.is_prime.restype = ctypes.c_int
 
 def power_mod(base: int, exponent: int, modulus: int) -> int:
     """
-    Calculate (base ^ exponent) % modulus
+    Calculate (base ^ exponent) % modulus.
+
+    This function computes the result of raising `base` to the power of `exponent`
+    and then taking the modulus with `modulus`.
+
+    Args:
+        base (int): The base number.
+        exponent (int): The exponent to which the base is raised. Must be non-negative.
+        modulus (int): The modulus value. Must not be zero.
+
+    Returns:
+        int: The result of (base ^ exponent) % modulus.
+
+    Raises:
+        ValueError: If the modulus is zero or the exponent is negative.
     """
     if modulus == 0:
         raise ValueError("Modulus cannot be zero")
@@ -60,13 +86,15 @@ def power_mod(base: int, exponent: int, modulus: int) -> int:
 
 def is_prime(n: int) -> bool:
     """
-    Check if a number is probably prime using Miller Rabin
+    Check if a number is probably prime using the Miller-Rabin primality test.
+
+    This function uses the Miller-Rabin algorithm to determine if the given number `n`
+    is likely to be a prime number.
+
+    Args:
+        n (int): The number to check for primality.
+
+    Returns:
+        bool: True if the number is probably prime, False otherwise.
     """
     return bool(num_lib.is_prime(n))
-
-
-# Quicky tests
-if __name__ == "__main__":
-    print(f"2^10 mod 1000 = {power_mod(2, 10, 1000)}")  # presuntamente 24
-    # Test primality
-    print(f"Is 17 prime? {is_prime(17)}")  # True

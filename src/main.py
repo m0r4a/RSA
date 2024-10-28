@@ -1,5 +1,5 @@
 #!/bin/python3
 
-from c_utils.c_utils import generate_prime
+from utils import generate_prime_pair
 
-print(generate_prime(34))
+print(generate_prime_pair(2000))
