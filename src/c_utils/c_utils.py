@@ -14,7 +14,7 @@ def compile_c_library():
     else:
         # This might be an error lol
         # Why would you not use Linux?
-        lib_file = src_dir / "libnumtheory.dll"
+        lib_file = src_dir / "libcutils.dll"
 
     if not lib_file.exists() or lib_file.stat().st_mtime < c_file.stat().st_mtime:
         os.system(f"gcc -shared -o {lib_file} -fPIC {c_file}")
