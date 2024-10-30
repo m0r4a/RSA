@@ -230,46 +230,53 @@ def validate_rsa_keys(cipher_int: int, n: int, d: int, e: int) -> Tuple[bool, st
     """
     try:
         # Positive values
-        if d == 198709817091870918701987:
-            print("fuck")
-            exit()
-
         if any(x <= 0 for x in [cipher_int, n, d, e]):
             return False, "Error: All values must be positive"
 
-        # Mod size
-        if n < 256:
-            return False, "Error: Modulus n is too small to be practical"
+        # private key < modulus
+        if d >= n:
+            return False, "Error: Private key 'd' must be smaller than modulus 'n'"
 
-        # Text < Mod
-        if cipher_int >= n:
-            return False, "Error: Ciphertext is greater than or equal to modulus"
-
-        # e and d not equal
-        if e == d:
-            return False, "Error: Public and private keys cannot be the same"
-
-        # Verify that e is coprime with n
+        # 'e' and 'd' coprime with 'n'
         gcd_e_n, _, _ = extended_gcd(e, n)
         if gcd_e_n != 1:
             return False, "Error: Public key 'e' is not coprime with modulus"
 
-        # Verify that d is coprime with n
         gcd_d_n, _, _ = extended_gcd(d, n)
         if gcd_d_n != 1:
             return False, "Error: Private key 'd' is not coprime with modulus"
 
-        # Additional RSA key properties
+        # checks for public key 'e'
         if e < 3:
             return False, "Error: Public key 'e' is too small"
 
         if e % 2 == 0:
             return False, "Error: Public key 'e' should be odd"
 
-        # Common values for e
         common_e_values = {3, 17, 65537}
         if e not in common_e_values:
             return False, f"Warning: Public key 'e' is not one of the common values {common_e_values}"
+
+        # private key 'd'
+        if d < n // 4:
+            return False, "Error: Private key 'd' is too small, which could make the system insecure"
+
+        if d % 2 == 0:
+            return False, "Error: Private key 'd' should be odd to avoid potential vulnerabilities"
+
+        # ciphertext is within the valid range
+        if cipher_int >= n:
+            return False, "Error: Ciphertext is greater than or equal to modulus"
+
+        ###########################################################
+        # This code is getting messy asf
+        test_message = 42
+        encrypted = pow(test_message, e, n)
+        decrypted = pow(encrypted, d, n)
+
+        if decrypted != test_message:
+            return False, "Error: Encryption/Decryption test failed, keys are not valid"
+        ###########################################################
 
         return True, "RSA keys appear to have valid properties"
 
