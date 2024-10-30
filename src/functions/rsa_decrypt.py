@@ -1,50 +1,65 @@
 #!/bin/python3
-from functions.generate_rsa_keys import generate_rsa_keys
-from functions.encoding_decoding import text_to_int
+from functions.encoding_decoding import int_to_text
 import time
 
 
-def i_hate_rsa(string: str, bits: int):
+def rsa_decrypt(cipher_int: int, n: int, d: int, e: int = 65537):
+    """
+    Decrypts an RSA-encrypted integer using the provided private key.
 
-    string, n, e, d, cipher_int, execution_time = rsa_stuff(string, bits)
+    This function decrypts the given cipher integer, displays the output with or without 
+    the `rich` library, and stores the results in files.
+
+    Args:
+        cipher_int (int): The encrypted integer to decrypt.
+        n (int): The modulus value used during encryption.
+        d (int): The private key (exponent) for decryption.
+        e (int, optional): The public key (exponent). Defaults to 65537.
+
+    Returns:
+        str: The decrypted text as a string.
+
+    Raises:
+        ImportError: If the `rich` library is not available, it falls back to plain output.
+    """
+
+    decrypted_text, execution_time = rsa_stuff(cipher_int, d, n)
 
     try:
         from rich.console import Console
-        rich_stuff(string, n, e, d, cipher_int, execution_time)
+        rich_stuff(cipher_int, n, e, d, decrypted_text, execution_time)
 
     except ImportError:
-        non_rich_stuff(string, n, e, d, cipher_int, execution_time)
+        non_rich_stuff(cipher_int, n, e, d, decrypted_text, execution_time)
 
-    files_stuff(string, n, e, d, cipher_int)
+    files_stuff(decrypted_text, n, e, d, cipher_int)
+
+    return decrypted_text
 
 
-def rsa_stuff(string: str, bits: int):
+def rsa_stuff(cipher_int: int, d, n):
     # Start execution time
     start_time = time.perf_counter()
-    message_int = text_to_int(string)
-    public_key, private_key = generate_rsa_keys(bits)
-    n, e = public_key
-    d = private_key[1]
-    cipher_int = pow(message_int, e, n)
+
+    decrypted_int = pow(cipher_int, d, n)
+    decrypted_text = int_to_text(decrypted_int)
+
     # Calculate and add execution time
     end_time = time.perf_counter()
     execution_time = (end_time - start_time) * 1000
 
-    return string, n, e, d, cipher_int, execution_time
+    return decrypted_text, execution_time
 
 
-def files_stuff(s: str, n: int, e: int, d: int, cipher_int: int):
-    with open("rsa.txt", "w") as f:
-        f.write(f"Your message: {s}\n\n")
-        f.write(f"Your modulo value: {n}\n\n")
-        f.write(f"Your Public key: {e}\n\n")
-        f.write(f"Your Private key: {d}")
-
-    with open("encrypted_message.txt", "w") as f:
-        f.write(str(cipher_int))
+def files_stuff(decrypted: str, n: int, e: int, d: int, cipher_int: int):
+    with open("decrypted.txt", "w") as f:
+        f.write(f"Your decrypted text is: {decrypted}\n\n")
+        f.write(f"Using modulo value: {n}\n\n")
+        f.write(f"With public key: {e}\n\n")
+        f.write(f"With private key: {d}")
 
 
-def non_rich_stuff(s: str, n: int, e: int, d: int, cipher_int: int, execution_time: int):
+def non_rich_stuff(cipher_int: str, n: int, e: int, d: int, decrypted: int, execution_time: int):
     RED = "\033[31m"
     GREEN = "\033[32m"
     CIAN = "\033[36m"
@@ -53,17 +68,17 @@ def non_rich_stuff(s: str, n: int, e: int, d: int, cipher_int: int, execution_ti
     def section(title, var): print(
         f"{GREEN}-------{title}-------{RESET}\n\n{var}\n")
 
-    section("Original Text", s)
+    section("Encrypted Text", cipher_int)
     section("Modulo (n)", n)
     section("Public Key (e)", e)
     section("Private Key (d)", d)
-    section("Encrypted Text", cipher_int)
+    section("Decrypted Text", decrypted)
     section("Execution time", execution_time)
-    print(f"{RED}Output has been saved in rsa.txt and encrypted_message.txt{RESET}")
+    print(f"{RED}Output has been saved in decrypted.txt{RESET}")
     print(f'\n{CIAN}Although there is support for not using the “Rich” library I highly recommend installing it, it took me a long time to make it not look horrible, be considerate.')
 
 
-def rich_stuff(s: str, n: int, e: int, d: int, cipher_int: int, execution_time: int):
+def rich_stuff(cipher_int: str, n: int, e: int, d: int, decrypted: int, execution_time: int):
 
     from rich.console import Console
     from rich.panel import Panel
@@ -83,7 +98,7 @@ def rich_stuff(s: str, n: int, e: int, d: int, cipher_int: int, execution_time: 
     main_table.add_column("Content", justify="center")
 
     # Title
-    title = Text("RSA Encryption Process", style="bold light_steel_blue")
+    title = Text("RSA Decryption", style="bold light_steel_blue")
     main_table.add_row(Panel(title, style="light_steel_blue", padding=(1, 30)))
 
     # Create info table
@@ -101,8 +116,8 @@ def rich_stuff(s: str, n: int, e: int, d: int, cipher_int: int, execution_time: 
 
     # Add rows with formatted content
     info_table.add_row(
-        "Original Text",
-        Panel(Text(s, style="misty_rose1 bold"),
+        "Encrypted Text",
+        Panel(Text(str(cipher_int), style="misty_rose1 bold"),
               border_style="misty_rose1")
     )
     info_table.add_row(
@@ -119,8 +134,8 @@ def rich_stuff(s: str, n: int, e: int, d: int, cipher_int: int, execution_time: 
         Panel(Text(str(d), style="red"), border_style="red", padding=(0, 1))
     )
     info_table.add_row(
-        "Encrypted Text",
-        Panel(Text(str(cipher_int), style="misty_rose1 bold"),
+        "Decrypted Text",
+        Panel(Text(str(decrypted), style="misty_rose1 bold"),
               border_style="misty_rose1")
     )
 
@@ -147,4 +162,4 @@ def rich_stuff(s: str, n: int, e: int, d: int, cipher_int: int, execution_time: 
 
     console.print(main_table)
     console.print(
-        "\n[red] Output has been saved in rsa.txt and encrypted_message.txt")
+        "\n[red] Output has been saved in decrypted.txt")

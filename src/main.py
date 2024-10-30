@@ -1,4 +1,6 @@
 #!/bin/python3
-from utils import i_hate_rsa
+from functions.rsa_encrypt import rsa_encrypt
+from functions.rsa_decrypt import rsa_decrypt
 
-i_hate_rsa("Hello, Bison",  1024)
+cipher, n, e, d = rsa_encrypt("Hello, Bison!")
+rsa_decrypt(cipher, n, e, d)

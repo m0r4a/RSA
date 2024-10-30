@@ -1,4 +1,4 @@
-from generate_rsa_keys import generate_rsa_keys, is_prime, extended_gcd
+from functions.generate_rsa_keys import generate_rsa_keys, is_prime, extended_gcd
 
 
 def test_rsa_key_generation():
