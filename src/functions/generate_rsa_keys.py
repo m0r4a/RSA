@@ -143,13 +143,14 @@ def extended_gcd(a: int, b: int) -> Tuple[int, int, int]:
     Returns:
         Tuple[int, int, int]: A tuple of (gcd, x, y) such that gcd = ax + by.
     """
-    if a == 0:
-        return b, 0, 1
-    else:
-        gcd, x1, y1 = extended_gcd(b % a, a)
-        x = y1 - (b // a) * x1
-        y = x1
-        return gcd, x, y
+    x0, x1, y0, y1 = 1, 0, 0, 1
+
+    while b != 0:
+        q, a, b = a // b, b, a % b
+        x0, x1 = x1, x0 - q * x1
+        y0, y1 = y1, y0 - q * y1
+
+    return a, x0, y0
 
 
 def generate_rsa_keys(bits: int, testing: bool = False) -> Tuple[Tuple[int, int], Tuple[int, int], Tuple[int, int]]:

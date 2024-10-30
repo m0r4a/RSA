@@ -1,5 +1,7 @@
 #!/bin/python3
 from functions.encoding_decoding import int_to_text
+from functions.generate_rsa_keys import extended_gcd
+from typing import Tuple
 import time
 
 
@@ -23,7 +25,8 @@ def rsa_decrypt(cipher_int: int, n: int, d: int, e: int = 65537):
         ImportError: If the `rich` library is not available, it falls back to plain output.
     """
 
-    type_error_handling(cipher_int, n, d, e)
+    if not error_handling(cipher_int, n, d, e):
+        return None
 
     decrypted_text, execution_time = rsa_stuff(cipher_int, d, n)
 
@@ -167,12 +170,108 @@ def rich_stuff(cipher_int: str, n: int, e: int, d: int, decrypted: int, executio
         "\n[red] Output has been saved in decrypted.txt")
 
 
-def type_error_handling(cipher_int, n, d, e):
+def error_handling(cipher_int, n, d, e):
+    """
+    Main error handling function for RSA operations.
+    Performs type checking and RSA key validation.
+
+    Args:
+        cipher_int: The ciphertext as an integer
+        n: The RSA modulus (n = p * q)
+        d: The private key
+        e: The public key
+    """
+    type_errors(cipher_int, n, d, e)
+
+    is_valid, message = validate_rsa_keys(cipher_int, n, d, e)
+
+    if not is_valid:
+        print(f"Validation failed: {message}")
+        return False
+
+    return True
+
+
+def type_errors(cipher_int, n, d, e):
+    """
+    Checks if all parameters are integers.
+
+    Args:
+        cipher_int: The ciphertext as an integer
+        n: The RSA modulus (n = p * q)
+        d: The private key
+        e: The public key
+
+    Raises:
+        ValueError: If any parameter is not an integer
+    """
     def check_var(var, x):
         if not isinstance(var, int):
             raise ValueError(f"Your {x} must be an int")
 
-    check_var(cipher_int, "cipher tex")
+    check_var(cipher_int, "cipher text")
     check_var(n, "modulus")
     check_var(d, "private key")
     check_var(e, "public key")
+
+
+def validate_rsa_keys(cipher_int: int, n: int, d: int, e: int) -> Tuple[bool, str]:
+    """
+    Validates mathematical properties of RSA keys and modulus.
+
+    Args:
+        cipher_int: The ciphertext as an integer
+        n: The RSA modulus (n = p * q)
+        d: The private key
+        e: The public key
+
+    Returns:
+        Tuple[bool, str]: (success, error/success message)
+    """
+    try:
+        # Positive values
+        if d == 198709817091870918701987:
+            print("fuck")
+            exit()
+
+        if any(x <= 0 for x in [cipher_int, n, d, e]):
+            return False, "Error: All values must be positive"
+
+        # Mod size
+        if n < 256:
+            return False, "Error: Modulus n is too small to be practical"
+
+        # Text < Mod
+        if cipher_int >= n:
+            return False, "Error: Ciphertext is greater than or equal to modulus"
+
+        # e and d not equal
+        if e == d:
+            return False, "Error: Public and private keys cannot be the same"
+
+        # Verify that e is coprime with n
+        gcd_e_n, _, _ = extended_gcd(e, n)
+        if gcd_e_n != 1:
+            return False, "Error: Public key 'e' is not coprime with modulus"
+
+        # Verify that d is coprime with n
+        gcd_d_n, _, _ = extended_gcd(d, n)
+        if gcd_d_n != 1:
+            return False, "Error: Private key 'd' is not coprime with modulus"
+
+        # Additional RSA key properties
+        if e < 3:
+            return False, "Error: Public key 'e' is too small"
+
+        if e % 2 == 0:
+            return False, "Error: Public key 'e' should be odd"
+
+        # Common values for e
+        common_e_values = {3, 17, 65537}
+        if e not in common_e_values:
+            return False, f"Warning: Public key 'e' is not one of the common values {common_e_values}"
+
+        return True, "RSA keys appear to have valid properties"
+
+    except Exception as ex:
+        return False, f"Unexpected error during validation: {str(ex)}"
