@@ -1,16 +1,76 @@
 #!/bin/python3
 from functions.generate_rsa_keys import generate_rsa_keys
-from functions.encoding_decoding import text_to_int, int_to_text
+from functions.encoding_decoding import text_to_int
 import time
-from rich.console import Console
-from rich.panel import Panel
-from rich.table import Table
-from rich.text import Text
 
 
-def i_hate_rsa(s):
-    console = Console()
+def i_hate_rsa(string: str, bits: int):
+
+    string, n, e, d, cipher_int, execution_time = rsa_stuff(string, bits)
+
+    try:
+        from rich.console import Console
+        rich_stuff(string, n, e, d, cipher_int, execution_time)
+
+    except ImportError:
+        non_rich_stuff(string, n, e, d, cipher_int, execution_time)
+
+    files_stuff(string, n, e, d, cipher_int)
+
+
+def rsa_stuff(string: str, bits: int):
+    # Start execution time
     start_time = time.perf_counter()
+    message_int = text_to_int(string)
+    public_key, private_key = generate_rsa_keys(bits)
+    n, e = public_key
+    d = private_key[1]
+    cipher_int = pow(message_int, e, n)
+    # Calculate and add execution time
+    end_time = time.perf_counter()
+    execution_time = (end_time - start_time) * 1000
+
+    return string, n, e, d, cipher_int, execution_time
+
+
+def files_stuff(s: str, n: int, e: int, d: int, cipher_int: int):
+    with open("rsa.txt", "w") as f:
+        f.write(f"Your message: {s}\n\n")
+        f.write(f"Your modulo value: {n}\n\n")
+        f.write(f"Your Public key: {e}\n\n")
+        f.write(f"Your Private key: {d}")
+
+    with open("encrypted_message.txt", "w") as f:
+        f.write(str(cipher_int))
+
+
+def non_rich_stuff(s: str, n: int, e: int, d: int, cipher_int: int, execution_time: int):
+    RED = "\033[31m"
+    GREEN = "\033[32m"
+    CIAN = "\033[36m"
+    RESET = "\033[0m"
+
+    def section(title, var): print(
+        f"{GREEN}-------{title}-------{RESET}\n\n{var}\n")
+
+    section("Original Text", s)
+    section("Modulo (n)", n)
+    section("Public Key (e)", e)
+    section("Private Key (d)", d)
+    section("Encrypted Text", cipher_int)
+    section("Execution time", execution_time)
+    print(f"{RED}Output has been saved in rsa.txt and encrypted_message.txt{RESET}")
+    print(f'\n{CIAN}Although there is support for not using the “Rich” library I highly recommend installing it, it took me a long time to make it not look horrible, be considerate.')
+
+
+def rich_stuff(s: str, n: int, e: int, d: int, cipher_int: int, execution_time: int):
+
+    from rich.console import Console
+    from rich.panel import Panel
+    from rich.table import Table
+    from rich.text import Text
+
+    console = Console()
 
     # Create the main table for the process
     main_table = Table(
@@ -25,15 +85,6 @@ def i_hate_rsa(s):
     # Title
     title = Text("RSA Encryption Process", style="bold light_steel_blue")
     main_table.add_row(Panel(title, style="light_steel_blue", padding=(1, 30)))
-
-    # Process RSA
-    message_int = text_to_int(s)
-    public_key, private_key = generate_rsa_keys(1024)
-    n, e = public_key
-    d = private_key[1]
-    cipher_int = pow(message_int, e, n)
-    decrypted_int = pow(cipher_int, d, n)
-    decrypted_text = int_to_text(decrypted_int)
 
     # Create info table
     info_table = Table(
@@ -68,17 +119,13 @@ def i_hate_rsa(s):
         Panel(Text(str(d), style="red"), border_style="red", padding=(0, 1))
     )
     info_table.add_row(
-        "Decrypted Text",
-        Panel(Text(decrypted_text, style="misty_rose1 bold"),
+        "Encrypted Text",
+        Panel(Text(str(cipher_int), style="misty_rose1 bold"),
               border_style="misty_rose1")
     )
 
     # Add the info table to the main table
     main_table.add_row(Panel(info_table, border_style="bright_blue"))
-
-    # Calculate and add execution time
-    end_time = time.perf_counter()
-    execution_time_ms = (end_time - start_time) * 1000
 
     # Create performance table
     perf_table = Table(
@@ -92,18 +139,12 @@ def i_hate_rsa(s):
     perf_table.add_column("Value", style="yellow")
     perf_table.add_row(
         "Execution Time",
-        f"{execution_time_ms:.4f} ms"
+        f"{execution_time:.4f} ms"
     )
 
     main_table.add_row("")  # Add spacing
     main_table.add_row(Panel(perf_table, border_style="green1"))
 
     console.print(main_table)
-
-    with open("output.txt", "w") as f:
-        f.write(f"Your message: {s}\n\n")
-        f.write(f"Your modulo value: {n}\n\n")
-        f.write(f"Your Public key: {e}\n\n")
-        f.write(f"Your Private key: {d}")
-
-    console.print("\n[red] Output has been saved to output.txt")
+    console.print(
+        "\n[red] Output has been saved in rsa.txt and encrypted_message.txt")
