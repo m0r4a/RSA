@@ -221,12 +221,14 @@ def type_errors(cipher_int, n, d, e):
 
 
 def test_encryption(n, e, d):
-    test_message = 26
+    test_message = 45
     encrypted = pow(test_message, e, n)
     decrypted = pow(encrypted, d, n)
 
     if decrypted != test_message:
         return False
+
+    return True
 
 
 def validate_rsa_keys(cipher_int: int, n: int, d: int, e: int) -> Tuple[bool, str]:
@@ -278,9 +280,6 @@ def validate_rsa_keys(cipher_int: int, n: int, d: int, e: int) -> Tuple[bool, st
             return False, f"Warning: Public key 'e' is not one of the common values {common_e_values}"
 
         # checks for private key 'd'
-        if d < n // 4:
-            return False, "Error: Private key 'd' is too small, which could make the system insecure"
-
         if d % 2 == 0:
             return False, "Error: Private key 'd' should be odd to avoid potential vulnerabilities"
 
