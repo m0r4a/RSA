@@ -99,3 +99,11 @@ def i_hate_rsa(s):
     main_table.add_row(Panel(perf_table, border_style="green1"))
 
     console.print(main_table)
+
+    with open("output.txt", "w") as f:
+        f.write(f"Your message: {s}\n\n")
+        f.write(f"Your modulo value: {n}\n\n")
+        f.write(f"Your Public key: {e}\n\n")
+        f.write(f"Your Private key: {d}")
+
+    console.print("\n[red] Output has been saved to output.txt")
