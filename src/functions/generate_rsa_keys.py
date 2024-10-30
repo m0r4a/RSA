@@ -94,7 +94,6 @@ def generate_random_prime(bits: int, low_primes: List[int]) -> int:
     Returns:
         int: A random prime number of the specified bit length.
     """
-    assert bits >= 2, "Number of bits must be at least 2"
 
     while True:
         # Generate a random odd integer of the specified bit length

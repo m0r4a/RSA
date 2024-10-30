@@ -28,6 +28,8 @@ def rsa_encrypt(string: str, bits: int = 2048) -> tuple[int, int, int, int]:
         it falls back to plain output.
     """
 
+    handle_errors(string, bits)
+
     string, n, e, d, cipher_int, execution_time = rsa_stuff(string, bits)
 
     try:
@@ -172,3 +174,15 @@ def rich_stuff(s: str, n: int, e: int, d: int, cipher_int: int, execution_time: 
     console.print(main_table)
     console.print(
         "\n[red] Output has been saved in encryption_info.txt and encrypted_message.txt")
+
+
+def handle_errors(string: str, bits: int):
+
+    if not isinstance(string, str):
+        raise ValueError("Your text to cipher must be a string")
+
+    if not isinstance(bits, int):
+        raise ValueError("Number of bits must be an int")
+
+    if bits <= 51:
+        raise ValueError("Number of bits must be at least 52")

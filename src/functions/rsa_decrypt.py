@@ -23,6 +23,8 @@ def rsa_decrypt(cipher_int: int, n: int, d: int, e: int = 65537):
         ImportError: If the `rich` library is not available, it falls back to plain output.
     """
 
+    type_error_handling(cipher_int, n, d, e)
+
     decrypted_text, execution_time = rsa_stuff(cipher_int, d, n)
 
     try:
@@ -163,3 +165,14 @@ def rich_stuff(cipher_int: str, n: int, e: int, d: int, decrypted: int, executio
     console.print(main_table)
     console.print(
         "\n[red] Output has been saved in decrypted.txt")
+
+
+def type_error_handling(cipher_int, n, d, e):
+    def check_var(var, x):
+        if not isinstance(var, int):
+            raise ValueError(f"Your {x} must be an int")
+
+    check_var(cipher_int, "cipher tex")
+    check_var(n, "modulus")
+    check_var(d, "private key")
+    check_var(e, "public key")
