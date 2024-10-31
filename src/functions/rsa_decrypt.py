@@ -2,7 +2,6 @@
 from functions.encoding_decoding import int_to_text
 from functions.generate_rsa_keys import extended_gcd
 from typing import Tuple
-from sys import exit as nuke_the_code
 import time
 
 
@@ -49,12 +48,7 @@ def rsa_stuff(cipher_int: int, d, n):
 
     decrypted_int = pow(cipher_int, d, n)
 
-    try:
-        decrypted_text = int_to_text(decrypted_int)
-    except UnicodeDecodeError:
-        print(
-            "Error: Why on earth would you think you could use different keys to decrypt?")
-        nuke_the_code()
+    decrypted_text = int_to_text(decrypted_int)
 
     # Calculate and add execution time
     end_time = time.perf_counter()
@@ -289,6 +283,12 @@ def validate_rsa_keys(cipher_int: int, n: int, d: int, e: int) -> Tuple[bool, st
         # checks for private key 'd'
         if d % 2 == 0:
             return False, "Error: Private key 'd' should be odd to avoid potential vulnerabilities"
+
+        # Check if the decrypted text is valid
+        try:
+            int_to_text(pow(cipher_int, d, n))
+        except UnicodeDecodeError:
+            return False, "Error: Why on earth would you think you could use different keys to decrypt?"
 
         # All tests were valid
         return True, None
