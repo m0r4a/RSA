@@ -2,6 +2,7 @@
 from functions.encoding_decoding import int_to_text
 from functions.generate_rsa_keys import extended_gcd
 from typing import Tuple
+from sys import exit as nuke_the_code
 import time
 
 
@@ -47,7 +48,13 @@ def rsa_stuff(cipher_int: int, d, n):
     start_time = time.perf_counter()
 
     decrypted_int = pow(cipher_int, d, n)
-    decrypted_text = int_to_text(decrypted_int)
+
+    try:
+        decrypted_text = int_to_text(decrypted_int)
+    except UnicodeDecodeError:
+        print(
+            "Error: Why on earth would you think you could use different keys to decrypt?")
+        nuke_the_code()
 
     # Calculate and add execution time
     end_time = time.perf_counter()
