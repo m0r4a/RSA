@@ -34,9 +34,14 @@ Esta función toma el número correspondiente al mensaje encriptado, el módulo,
 from functions.rsa_decrypt import rsa_decrypt
 
 
-rsa_decrypt(cipher, n, d, e)
+rsa_decrypt(texto_cifrado, modulo, llave_privada, llave_publca)
 ```
 
-## Buenas prácticas
+## full_test.py
 
-Aunque el código funciona y ha pasado por diferentes etapas de refactorización creo que aún se puede mejorar mucho, trataré de que las funciones no tengan _side effects_, simplemente devuelvan los valores y el print de tablas que sea aparte, fuera de eso, creo que está bien el código.
+En este archivo contiene una pequeña prueba pre-escrita para de como se ve encriptar y desencriptar algo
+
+## To-Do
+
+- Mejorar las funciones para que no tengan side-effects
+- Mejorar el manejo del output de las llaves
