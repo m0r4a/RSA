@@ -19,7 +19,7 @@ from functions.rsa_encrypt import rsa_encrypt
 texto_cifrado, modulo, llave_privada, llave_publica = rsa_encrypt("Hello, Bison!", 512)
 ```
 
-> [!NOTA]
+> [!NOTE]
 > Al parecer que el valor de la llave pública sea "65537" es como un estandar o algo así, entonces dejé que la llave pública sea siempre ese valor.
 
 ### rsa_decrypt
